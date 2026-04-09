@@ -40,10 +40,18 @@ class bitVector {
     bitVector(unsigned long capacity, float growth_ratio);
     ~bitVector();
 
+    bitVector(const bitVector& other);
+    
+    bitVector& operator=(const bitVector& other);
+    
+    bitVector(bitVector&& other) noexcept;
+    
+    bitVector& operator=(bitVector&& other) noexcept;
+
     void set1(unsigned long i);
     void set0(unsigned long i);
     int  access(unsigned long i);
-    int operator[](unsigned long i);
+    int operator[](unsigned long i) const;
     void put(bitVector* SRC, unsigned long k, unsigned long i);
 
     void append0();

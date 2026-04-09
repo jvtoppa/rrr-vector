@@ -81,6 +81,70 @@ bitVector::~bitVector() {
     free(A);
 }
 
+// Copy constructor
+bitVector::bitVector(const bitVector& other) 
+    : cap(other.cap), len(other.len), ratio(other.ratio)
+{
+    if (cap > 0) {
+        A = new TYPE[cap];
+        for (TYPE i = 0; i < cap; i++) {
+            A[i] = other.A[i];
+        }
+    } else {
+        A = nullptr;
+    }
+}
+
+// Move constructor
+bitVector::bitVector(bitVector&& other) noexcept
+    : A(other.A),
+      cap(other.cap),
+      len(other.len),
+      ratio(other.ratio)
+{
+    other.A = nullptr;
+    other.cap = 0;
+    other.len = 0;
+}
+
+// Copy assignment operator
+bitVector& bitVector::operator=(const bitVector& other) {
+    if (this != &other) {
+        delete[] A;
+        
+        cap = other.cap;
+        len = other.len;
+        ratio = other.ratio;
+        
+        if (cap > 0) {
+            A = new TYPE[cap];
+            for (TYPE i = 0; i < cap; i++) {
+                A[i] = other.A[i];
+            }
+        } else {
+            A = nullptr;
+        }
+    }
+    return *this;
+}
+
+// Move assignment operator
+bitVector& bitVector::operator=(bitVector&& other) noexcept {
+    if (this != &other) {
+        delete[] A;
+        
+        A = other.A;
+        cap = other.cap;
+        len = other.len;
+        ratio = other.ratio;
+        
+        other.A = nullptr;
+        other.cap = 0;
+        other.len = 0;
+    }
+    return *this;
+}
+
 // TODO: change this funtion to be a method of 'bitVector', does it really need to be a method?
 
 // allocates new space for the bitvector, returns 1 if sucess
@@ -125,7 +189,7 @@ int bitVector::access(unsigned long i) {
     return (A[i / NBITS] & (((TYPE)1 << (NBITS - 1)) >> (i%NBITS))) ? 1 : 0;
 }
 
-int bitVector::operator[](const unsigned long i) {
+int bitVector::operator[](const unsigned long i) const{
 
     return (A[i / NBITS] & (((TYPE)1 << (NBITS - 1)) >> (i%NBITS))) ? 1 : 0;
 }
