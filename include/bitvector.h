@@ -43,7 +43,7 @@ class bitVector {
     void set1(unsigned long i);
     void set0(unsigned long i);
     int  access(unsigned long i);
-
+    int operator[](unsigned long i);
     void put(bitVector* SRC, unsigned long k, unsigned long i);
 
     void append0();

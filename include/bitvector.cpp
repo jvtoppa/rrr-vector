@@ -125,6 +125,11 @@ int bitVector::access(unsigned long i) {
     return (A[i / NBITS] & (((TYPE)1 << (NBITS - 1)) >> (i%NBITS))) ? 1 : 0;
 }
 
+int bitVector::operator[](const unsigned long i) {
+
+    return (A[i / NBITS] & (((TYPE)1 << (NBITS - 1)) >> (i%NBITS))) ? 1 : 0;
+}
+
 /**
    Add 0 to the end of A and increase |A| by one.
 **/
