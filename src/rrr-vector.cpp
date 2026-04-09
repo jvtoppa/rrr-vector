@@ -81,7 +81,7 @@ pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(siz
     return {table, pattern_to_offset};
 }
 
-vector<size_t> K(bitVector bv, size_t t)
+vector<size_t> K(bitVector bv, size_t t, bool verbose = false)
 {
     size_t n = bv.getLength();
     vector<size_t> v;
@@ -100,35 +100,49 @@ vector<size_t> K(bitVector bv, size_t t)
             counter = 0;
         }
     }
-
-    for (auto item : v)
+    if(verbose)
     {
-        cout << item << " ";
+        cout << "K: ";
+        for (auto item : v)
+        {
+            cout << item << " ";
+        }
+        cout << "\n";
     }
 
     return v;
 }
-vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t)
+
+vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose = false) //TODO: add tuple with marker for variable R. Should receive R as part of the function
 {
     size_t n = K.size();
     vector<size_t> superblock;
 
-    for (size_t i = 0; i < n; i += factor * t)
+    size_t global_rank = 0;
+    for (size_t i = 0; i < n; i += factor)
     {
-        size_t global_rank = 0;
 
-        for (size_t j = i; j < min(i + factor * t, n); j++)
+        for (size_t j = i; j < min(i + factor, n); j++)
         {
             global_rank += K[j];
         }
 
         superblock.push_back(global_rank);
     }
-
+    if(verbose)
+    {
+        cout << "Superblocks: "; 
+        for(int i = 0; i < superblock.size(); i++)
+        {
+            cout << superblock[i] << " ";
+        }
+        cout << "\n";
+    }
     return superblock;
 }
 
-vector<size_t> R(bitVector bv, unordered_map<string, size_t> &map, size_t t)
+
+vector<size_t> R(bitVector bv, unordered_map<string, size_t> &map, size_t t, bool verbose = false)
 {
     size_t n = bv.getLength();
     string block = "";
@@ -155,16 +169,20 @@ vector<size_t> R(bitVector bv, unordered_map<string, size_t> &map, size_t t)
         }
         R.push_back(map[block]);
     }
-    cout << "R: ";
-    for (size_t i = 0; i < R.size(); i++)
+    if(verbose)
     {
-        cout << R[i] << " ";
+        cout << "R: ";
+        for (size_t i = 0; i < R.size(); i++)
+        {
+            cout << R[i] << " ";
+        }
+        cout << "\n";
     }
 
     return R;
 }
 
-void rank(size_t i, vector<size_t> superblock, vector<size_t> K, size_t t, size_t factor)
+void rank(size_t i, vector<size_t> superblock, vector<size_t> K, size_t t, size_t factor, vector<size_t> R)
 {
     size_t block_index = ceil(i / t);
     size_t superblock_index = ceil(block_index / factor);
@@ -175,6 +193,8 @@ void rank(size_t i, vector<size_t> superblock, vector<size_t> K, size_t t, size_
         sum += K[i];
     }
 
+
+
     // Repeat previous step until we reach . We then add (from , not the global rank)
     //  to our result, where , and is the position we are querying local to.
     //  Our final answer is the result.
@@ -182,16 +202,19 @@ void rank(size_t i, vector<size_t> superblock, vector<size_t> K, size_t t, size_
 
 int main(void)
 {
-    string input = "banana";
+    string input = "bananaana";
     bitVector bv = B(input);
     bv.print();
-    pair<vector<vector<bitVector>>, unordered_map<string, size_t>> maps = create_tables(4);
+    size_t t = max(1.0, ceil(log2(bv.getLength()) / 2));
+    cout << t << "\n";
+    pair<vector<vector<bitVector>>, unordered_map<string, size_t>> maps = create_tables(t);
 
-    vector<size_t> Ka = K(bv, 4);
-    vector<size_t> Ra = R(bv, maps.second, 4);
-
-    cout << "maps: " << Ka[0] << Ra[0] << "\n";
-    maps.first[Ra[2]][Ka[2]].print();
+    vector<size_t> k = K(bv, t); // Offset vector;
+    vector<size_t> r = R(bv, maps.second, t); // Class vector
+    superblock(k, 3, t, true);
+    cout << "k size: " <<k.size() << "\n";
+    //cout << "maps: " << r[0] << k[0] << "\n";
+    //    maps.first[r[2]][k[2]].print();
 
     return 0;
 }
