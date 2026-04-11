@@ -1,14 +1,27 @@
 CXX = g++
-CXXFLAGS = -O3 -w
+CXXFLAGS = -O3 -w -I./include
 
+# Sources
 SRC = ./src/rrr-vector.cpp ./include/bitvector.cpp
-OUT = build/rrr-vector
+TEST_SRC = ./unit-tests/unit.cpp
 
-all: $(OUT)
+# Outputs
+#OUT = build/rrr-vector
+TEST_OUT = build/unit-test
 
-$(OUT): $(SRC)
+.PHONY: all clean
+
+all: $(OUT) $(TEST_OUT)
+
+# Build the main executable
+#$(OUT): $(SRC)
+#	mkdir -p build
+#	$(CXX) $(CXXFLAGS) -o $(OUT) $(SRC)
+
+# Build the unit test executable
+$(TEST_OUT): $(TEST_SRC) $(SRC)
 	mkdir -p build
-	$(CXX) $(CXXFLAGS) -o $(OUT) $(SRC)
+	$(CXX) $(CXXFLAGS) -o $(TEST_OUT) $(TEST_SRC) $(SRC)
 
 clean:
-	rm -f $(OUT)
+	rm -rf build

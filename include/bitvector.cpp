@@ -215,7 +215,7 @@ void bitVector::append1() {
     set1(len++);
 }
 
-unsigned long bitVector::getLength() { return len; }
+unsigned long bitVector::getLength() const { return len; }
 unsigned long bitVector::getCap() { return cap; }
 
 // Criar um utils?? colocar na endian????

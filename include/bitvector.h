@@ -32,7 +32,7 @@ class bitVector {
     // Methods implemented post GPT (originals by stringers)
     unsigned long ceil(unsigned long ul);
     int grow(unsigned long ncap);
-    unsigned long getLength();
+    unsigned long getLength() const;
     void extend(bitVector* B);
     unsigned long getCap();
 
@@ -60,7 +60,7 @@ class bitVector {
     void append(unsigned long number, unsigned long k);
 
 
-    void print();
+      void print();
 };
 
 #endif

@@ -2,12 +2,13 @@
 #include <iostream>
 #include <vector>
 #include "../include/bitvector.h"
+#include "rrr-vector.h"
 #include <cmath>
 #include <unordered_map>
 
 using namespace std;
 
-bitVector B(string s)
+bitVector B(const string& s)
 {
     size_t n = s.size();
     bitVector bv = bitVector(n * 8, 8);
@@ -81,7 +82,7 @@ pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(siz
     return {table, pattern_to_offset};
 }
 
-vector<size_t> K(bitVector bv, size_t t, bool verbose = false)
+vector<size_t> K(const bitVector& bv, size_t t, bool verbose) //should be done with popcount
 {
     size_t n = bv.getLength();
     vector<size_t> v;
@@ -113,7 +114,7 @@ vector<size_t> K(bitVector bv, size_t t, bool verbose = false)
     return v;
 }
 
-vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose = false) //TODO: add tuple with marker for variable R. Should receive R as part of the function
+vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose) //TODO: add tuple with marker for variable R. Should receive R as part of the function
 {
     size_t n = K.size();
     vector<size_t> superblock;
@@ -122,12 +123,12 @@ vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool
     for (size_t i = 0; i < n; i += factor)
     {
 
+        superblock.push_back(global_rank);
         for (size_t j = i; j < min(i + factor, n); j++)
         {
             global_rank += K[j];
         }
 
-        superblock.push_back(global_rank);
     }
     if(verbose)
     {
@@ -142,7 +143,7 @@ vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool
 }
 
 
-vector<size_t> R(bitVector bv, unordered_map<string, size_t> &map, size_t t, bool verbose = false)
+vector<size_t> R(bitVector& bv, unordered_map<string, size_t> &map, size_t t, bool verbose)
 {
     size_t n = bv.getLength();
     string block = "";
@@ -182,39 +183,55 @@ vector<size_t> R(bitVector bv, unordered_map<string, size_t> &map, size_t t, boo
     return R;
 }
 
-void rank(size_t i, vector<size_t> superblock, vector<size_t> K, size_t t, size_t factor, vector<size_t> R)
+size_t rank1(size_t i, const vector<size_t>& sb, const vector<size_t>& K, size_t t, size_t factor, const vector<size_t>& R, const vector<vector<bitVector>>& mp, size_t n)
 {
-    size_t block_index = ceil(i / t);
-    size_t superblock_index = ceil(block_index / factor);
-    size_t sum = superblock[superblock_index];
-    size_t n = K.size();
-    for (size_t i = superblock_index; i < min(superblock_index + factor, n); i++)
+    if (i >= n)
     {
-        sum += K[i];
+        return rank1(n - 1, sb, K, t, factor, R, mp, n);
+    }
+    size_t block_index = i / t;
+    size_t superblock_index = block_index / factor;
+
+    size_t sum = sb[superblock_index];
+
+    size_t start_block = superblock_index * factor;
+    for (size_t j = start_block; j < block_index; j++)
+    {
+        sum += K[j];
     }
 
+    bitVector block = mp[K[block_index]][R[block_index]];
 
+    size_t bit_offset = i % t;
 
-    // Repeat previous step until we reach . We then add (from , not the global rank)
-    //  to our result, where , and is the position we are querying local to.
-    //  Our final answer is the result.
+    for (size_t j = 0; j <= bit_offset; j++)
+    {
+        sum += block[j]; 
+    }
+
+    return sum;
 }
-
+/*
 int main(void)
 {
-    string input = "bananaana";
+    string input = "aaaaaaaaaaaaaaaaaaa";
     bitVector bv = B(input);
     bv.print();
     size_t t = max(1.0, ceil(log2(bv.getLength()) / 2));
-    cout << t << "\n";
+    size_t factor = max(1.0, ceil(log2(bv.getLength())));
+    cout << "T = " << t << " Factor = " << factor << "\n";
+    cout << "Creating tables...\n";
     pair<vector<vector<bitVector>>, unordered_map<string, size_t>> maps = create_tables(t);
-
-    vector<size_t> k = K(bv, t); // Offset vector;
-    vector<size_t> r = R(bv, maps.second, t); // Class vector
-    superblock(k, 3, t, true);
-    cout << "k size: " <<k.size() << "\n";
-    //cout << "maps: " << r[0] << k[0] << "\n";
-    //    maps.first[r[2]][k[2]].print();
-
+    cout << "Calculating K...\n";
+    vector<size_t> k = K(bv, t, true); // Offset vector;
+    cout << "Calculating R...\n";
+    vector<size_t> r = R(bv, maps.second, t, true); // Class vector
+    cout << "Calculating Superblocks...\n";
+    vector<size_t> sb = superblock(k, factor, t, true);
+    cout << "K size: " << k.size() << "\n";
+    cout << "Calculating rank...\n";
+    cout << rank1(64, sb, k, t, factor, r, maps.first) << "\n";
+    cout << "Done.\n";
     return 0;
 }
+*/
