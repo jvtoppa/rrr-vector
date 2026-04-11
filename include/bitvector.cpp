@@ -15,6 +15,7 @@
 #include <cassert>
 #include "bitvector.h"
 #include <iostream>
+#include <bit> 
 using namespace std;
 
 #if IS32BIT
@@ -81,6 +82,9 @@ bitVector::~bitVector() {
     free(A);
 }
 
+
+
+
 // Copy constructor
 bitVector::bitVector(const bitVector& other) 
     : cap(other.cap), len(other.len), ratio(other.ratio)
@@ -143,6 +147,25 @@ bitVector& bitVector::operator=(bitVector&& other) noexcept {
         other.len = 0;
     }
     return *this;
+}
+
+
+unsigned long bitVector::popcount(unsigned long i) const {
+    if (i >= len) i = len - 1;
+
+    unsigned long total = 0;
+    unsigned long target_word = i / NBITS;
+    unsigned long bit_offset = i % NBITS;
+
+    for (unsigned long j = 0; j < target_word; j++) {
+        total += __builtin_popcountll(A[j]);
+    }
+
+    TYPE mask = (TYPE)0xFFFFFFFFFFFFFFFF << (NBITS - 1 - bit_offset);
+    
+    total += __builtin_popcountll(A[target_word] & mask);
+
+    return total;
 }
 
 // TODO: change this funtion to be a method of 'bitVector', does it really need to be a method?

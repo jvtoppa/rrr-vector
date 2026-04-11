@@ -1,5 +1,5 @@
 #include <cstdint>
-
+#include <bit>
 #ifndef BITVECTOR
 #define BITVECTOR
 
@@ -47,7 +47,7 @@ class bitVector {
     bitVector(bitVector&& other) noexcept;
     
     bitVector& operator=(bitVector&& other) noexcept;
-
+    unsigned long popcount(unsigned long i) const;
     void set1(unsigned long i);
     void set0(unsigned long i);
     int  access(unsigned long i);

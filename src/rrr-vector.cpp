@@ -5,7 +5,7 @@
 #include "rrr-vector.h"
 #include <cmath>
 #include <unordered_map>
-
+#include <bit>
 using namespace std;
 
 bitVector B(const string& s)
@@ -200,14 +200,11 @@ size_t rank1(size_t i, const vector<size_t>& sb, const vector<size_t>& K, size_t
         sum += K[j];
     }
 
-    bitVector block = mp[K[block_index]][R[block_index]];
+    const bitVector& block = mp[K[block_index]][R[block_index]];
 
     size_t bit_offset = i % t;
 
-    for (size_t j = 0; j <= bit_offset; j++)
-    {
-        sum += block[j]; 
-    }
+    sum += block.popcount(bit_offset);
 
     return sum;
 }
