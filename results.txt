@@ -1,0 +1,48 @@
+Running RRR Unit Tests
+
+[OK] All identical chars passed (tested all 152 bits).
+[OK] Alternating chars passed (tested all 128 bits).
+[OK] Random words passed (tested all 344 bits).
+[OK] Short string passed (tested all 16 bits).
+
+--- Benchmarking RRR vs Naive ---
+Tested 4 queries on a bitvector of size 80 bits.
+Rank Operation Time (total):   0.000406 ms
+Rank Operation Time (per operation) 101.5ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 40 queries on a bitvector of size 800 bits.
+Rank Operation Time (total):   0.001806 ms
+Rank Operation Time (per operation) 45.15ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 400 queries on a bitvector of size 8000 bits.
+Rank Operation Time (total):   0.017692 ms
+Rank Operation Time (per operation) 44.23ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 4000 queries on a bitvector of size 80000 bits.
+Rank Operation Time (total):   0.165527 ms
+Rank Operation Time (per operation) 41.3818ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 40000 queries on a bitvector of size 800000 bits.
+Rank Operation Time (total):   1.75685 ms
+Rank Operation Time (per operation) 43.9212ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 400000 queries on a bitvector of size 8000000 bits.
+Rank Operation Time (total):   24.4889 ms
+Rank Operation Time (per operation) 61.2221ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 4000000 queries on a bitvector of size 80000000 bits.
+Rank Operation Time (total):   278.683 ms
+Rank Operation Time (per operation) 69.6709ns 
+
+--- Benchmarking RRR vs Naive ---
+Tested 40000000 queries on a bitvector of size 800000000 bits.
+Rank Operation Time (total):   3365.59 ms
+Rank Operation Time (per operation) 84.1397ns 
+
+--- All tests passed successfully! ---
