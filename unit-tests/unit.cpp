@@ -48,11 +48,11 @@ void test_rank1_correctness(string test_name, string input_string)
     cout << "[OK] " << test_name << " passed (tested all " << n << " bits).\n";
 }
 
-void benchmark_rank1()
+void benchmark_rank1(size_t string_size, size_t num_queries)
 {
     cout << "\n--- Benchmarking RRR vs Naive ---\n";
 
-    size_t string_size = 500000000 / 4;
+    size_t string_size /= 4;
     cout << "Bitstring size: " << string_size * 8 << "\n";
     string large_string(string_size, 'a');
     for (size_t i = 0; i < string_size; i++) {
@@ -70,7 +70,6 @@ void benchmark_rank1()
     vector<size_t> r_vec = R(bv, maps.second, t);
     vector<size_t> sb = superblock(k_vec, factor, t, false);
 
-    size_t num_queries = 40000000;
     vector<size_t> queries(num_queries);
     for(size_t i = 0; i < num_queries; ++i) {
         queries[i] = rand() % n;
@@ -103,9 +102,13 @@ int main()
     test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
 
     test_rank1_correctness("Short string", "hi");
-
-    benchmark_rank1();
-
+    for (size_t i = 40; i < 1e9; i *= 10)
+    {
+        benchmark_rank1(i,i / 10);
+        
+    }
+    
+    
     cout << "\n--- All tests passed successfully! ---\n";
 
     return 0;
