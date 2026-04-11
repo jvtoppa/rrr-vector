@@ -16,7 +16,6 @@ if not os.path.exists(binary_path):
 
 result = subprocess.run([binary_path], capture_output=True, text=True)
 
-# Access the results
 print("Output:", result.stdout.strip())
 with open("results.txt", "w") as f:
         f.write(result.stdout)
