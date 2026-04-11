@@ -53,7 +53,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     cout << "\n--- Benchmarking RRR vs Naive ---\n";
 
     string_size /= 4;
-    cout << "Bitstring size: " << string_size * 8 << "\n";
+   // cout << "Bitstring size: " << string_size * 8 << "\n";
     string large_string(string_size, 'a');
     for (size_t i = 0; i < string_size; i++) {
         large_string[i] = (char)(rand() % 256);
@@ -64,7 +64,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
 
     size_t t = max(1.0, ceil(log2(n) / 2.0));
     size_t factor = max(1.0, ceil(log2(n)));
-    cout << "Building structures...\n";
+   // cout << "Building structures...\n";
     auto maps = create_tables(t);
     vector<size_t> k_vec = K(bv, t);
     vector<size_t> r_vec = R(bv, maps.second, t);
@@ -74,8 +74,8 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     for(size_t i = 0; i < num_queries; ++i) {
         queries[i] = rand() % n;
     }
-    cout << "Starting doing rank operations...\n";
-    cout << "No. of rank queries: " << num_queries << "\n";
+  //  cout << "Starting doing rank operations...\n";
+   // cout << "No. of rank queries: " << num_queries << "\n";
     
     auto start_rrr = chrono::high_resolution_clock::now();
     for(size_t q : queries) {
@@ -94,7 +94,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
 
 int main()
 {
-    cout << "--- Running RRR Unit Tests ---\n\n";
+    cout << "Running RRR Unit Tests\n\n";
 
     test_rank1_correctness("All identical chars", "aaaaaaaaaaaaaaaaaaa");
 
@@ -103,6 +103,7 @@ int main()
     test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
 
     test_rank1_correctness("Short string", "hi");
+ 
     for (size_t i = 40; i < 1e9; i *= 10)
     {
         benchmark_rank1(i,i / 10);

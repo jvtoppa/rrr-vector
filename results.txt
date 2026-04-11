@@ -1,0 +1,80 @@
+--- Running RRR Unit Tests ---
+
+[OK] All identical chars passed (tested all 152 bits).
+[OK] Alternating chars passed (tested all 128 bits).
+[OK] Random words passed (tested all 344 bits).
+[OK] Short string passed (tested all 16 bits).
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 80
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 4
+Tested 4 queries on a bitvector of size 80 bits.
+Rank Operation Time (total):   0.000236 ms
+Rank Operation Time (per operation) 59ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 800
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 40
+Tested 40 queries on a bitvector of size 800 bits.
+Rank Operation Time (total):   0.00091 ms
+Rank Operation Time (per operation) 22.75ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 8000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 400
+Tested 400 queries on a bitvector of size 8000 bits.
+Rank Operation Time (total):   0.007617 ms
+Rank Operation Time (per operation) 19.0425ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 80000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 4000
+Tested 4000 queries on a bitvector of size 80000 bits.
+Rank Operation Time (total):   0.076644 ms
+Rank Operation Time (per operation) 19.161ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 800000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 40000
+Tested 40000 queries on a bitvector of size 800000 bits.
+Rank Operation Time (total):   0.809019 ms
+Rank Operation Time (per operation) 20.2255ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 8000000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 400000
+Tested 400000 queries on a bitvector of size 8000000 bits.
+Rank Operation Time (total):   12.7805 ms
+Rank Operation Time (per operation) 31.9512ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 80000000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 4000000
+Tested 4000000 queries on a bitvector of size 80000000 bits.
+Rank Operation Time (total):   236.821 ms
+Rank Operation Time (per operation) 59.2053ns 
+
+--- Benchmarking RRR vs Naive ---
+Bitstring size: 800000000
+Building structures...
+Starting doing rank operations...
+No. of rank queries: 40000000
+Tested 40000000 queries on a bitvector of size 800000000 bits.
+Rank Operation Time (total):   5904.78 ms
+Rank Operation Time (per operation) 147.62ns 
+
+--- All tests passed successfully! ---
