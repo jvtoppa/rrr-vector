@@ -52,7 +52,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
 {
     cout << "\n--- Benchmarking RRR vs Naive ---\n";
 
-    size_t string_size /= 4;
+    string_size /= 4;
     cout << "Bitstring size: " << string_size * 8 << "\n";
     string large_string(string_size, 'a');
     for (size_t i = 0; i < string_size; i++) {
