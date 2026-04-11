@@ -8,7 +8,7 @@ To create an RRR structure, use RRR15(string). To find a position, do RRR15.rank
 
 # Some stats:
 
-RRR vs Naive: Rank Operation Performance
+Rank Operation Performance
 
 | Queries | Bitvector Size (bits) | Total Time (ms) | Time/Operation (ns) |
 | :--- | :--- | :--- | :--- |
