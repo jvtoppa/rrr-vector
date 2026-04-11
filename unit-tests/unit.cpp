@@ -87,7 +87,8 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     chrono::duration<double, std::milli> rrr_time = end_rrr - start_rrr;
 
     cout << "Tested " << num_queries << " queries on a bitvector of size " << n << " bits.\n";
-    cout << "RRR Time:   " << rrr_time.count() << " ms\n";
+    cout << "Rank Operation Time (total):   " << rrr_time.count() << " ms\n";
+    cout << "Rank Operation Time (per operation) " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
 }
 
 
