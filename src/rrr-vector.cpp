@@ -8,7 +8,10 @@
 #include <bit>
 using namespace std;
 
-bitVector B(const string& s)
+
+RRR15::~RRR15() {}
+
+bitVector RRR15::B(const string& s)
 {
     size_t n = s.size();
     bitVector bv = bitVector(n * 8, 8);
@@ -32,7 +35,7 @@ bitVector B(const string& s)
 
 // There are 2^t possible bitvectors. Each of them must be saved to a class based
 // on no. of zeros.
-pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(size_t t) // access: table[class][block]
+pair<vector<vector<bitVector>>, unordered_map<string, size_t>> RRR15::create_tables(size_t t) // access: table[class][block]
 {
     vector<vector<bitVector>> table(t + 1);
     unordered_map<string, size_t> pattern_to_offset;
@@ -51,7 +54,7 @@ pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(siz
         {
             block.set0(i);
         }
-
+        size_t clss = 0;
         for (size_t j = t; j > 0; j--)
         {
             size_t bit = (x >> (j - 1)) & 1;
@@ -59,21 +62,13 @@ pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(siz
             {
                 pattern += "1";
                 block.set1(t - j);
+                clss++;
             }
 
             else
                 pattern += "0";
         }
 
-        // Counts how many ones in bitvector
-        // to choose the class
-
-        size_t clss = 0;
-        for (size_t j = 0; j < t; j++)
-        {
-            if (block[j] == 1)
-                clss++;
-        }
         size_t offset = table[clss].size();
         table[clss].push_back(block);
         pattern_to_offset[pattern] = offset;
@@ -82,7 +77,7 @@ pair<vector<vector<bitVector>>, unordered_map<string, size_t>> create_tables(siz
     return {table, pattern_to_offset};
 }
 
-vector<size_t> K(const bitVector& bv, size_t t, bool verbose) //should be done with popcount
+vector<size_t> RRR15::K(const bitVector& bv, size_t t, bool verbose) //should be done with popcount
 {
     size_t n = bv.getLength();
     vector<size_t> v;
@@ -114,7 +109,7 @@ vector<size_t> K(const bitVector& bv, size_t t, bool verbose) //should be done w
     return v;
 }
 
-vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose) //TODO: add tuple with marker for variable R. Should receive R as part of the function
+vector<size_t> RRR15::superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose) //TODO: add tuple with marker for variable R. Should receive R as part of the function
 {
     size_t n = K.size();
     vector<size_t> superblock;
@@ -143,7 +138,7 @@ vector<size_t> superblock(const vector<size_t> &K, size_t factor, size_t t, bool
 }
 
 
-vector<size_t> R(bitVector& bv, unordered_map<string, size_t> &map, size_t t, bool verbose)
+vector<size_t> RRR15::R(bitVector& bv, unordered_map<string, size_t> &map, size_t t, bool verbose)
 {
     size_t n = bv.getLength();
     string block = "";
@@ -183,52 +178,54 @@ vector<size_t> R(bitVector& bv, unordered_map<string, size_t> &map, size_t t, bo
     return R;
 }
 
-size_t rank1(size_t i, const vector<size_t>& sb, const vector<size_t>& K, size_t t, size_t factor, const vector<size_t>& R, const vector<vector<bitVector>>& mp, size_t n)
-{
+size_t RRR15::rank1(size_t i) const {
+
     if (i >= n)
     {
-        return rank1(n - 1, sb, K, t, factor, R, mp, n);
+        i = n - 1; 
     }
+
     size_t block_index = i / t;
     size_t superblock_index = block_index / factor;
 
-    size_t sum = sb[superblock_index];
+    size_t sum = sb_vector[superblock_index];
 
     size_t start_block = superblock_index * factor;
-    for (size_t j = start_block; j < block_index; j++)
-    {
-        sum += K[j];
+    for (size_t j = start_block; j < block_index; j++) {
+        sum += k_vector[j];
     }
 
-    const bitVector& block = mp[K[block_index]][R[block_index]];
+    const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
 
     size_t bit_offset = i % t;
-
+    
     sum += block.popcount(bit_offset);
 
     return sum;
 }
-/*
-int main(void)
+
+
+RRR15::RRR15(const string& s, bool verbose) : verbose(verbose)
 {
-    string input = "aaaaaaaaaaaaaaaaaaa";
-    bitVector bv = B(input);
-    bv.print();
-    size_t t = max(1.0, ceil(log2(bv.getLength()) / 2));
-    size_t factor = max(1.0, ceil(log2(bv.getLength())));
-    cout << "T = " << t << " Factor = " << factor << "\n";
-    cout << "Creating tables...\n";
-    pair<vector<vector<bitVector>>, unordered_map<string, size_t>> maps = create_tables(t);
-    cout << "Calculating K...\n";
-    vector<size_t> k = K(bv, t, true); // Offset vector;
-    cout << "Calculating R...\n";
-    vector<size_t> r = R(bv, maps.second, t, true); // Class vector
-    cout << "Calculating Superblocks...\n";
-    vector<size_t> sb = superblock(k, factor, t, true);
-    cout << "K size: " << k.size() << "\n";
-    cout << "Calculating rank...\n";
-    cout << rank1(64, sb, k, t, factor, r, maps.first) << "\n";
-    cout << "Done.\n";
-    return 0;
+    bitVector bv = B(s); 
+    this->n = bv.getLength();
+
+    size_t calc_t = (size_t)max(1.0, ceil(log2(n) / 2.0));
+    this->t = (calc_t < 15) ? calc_t : 15;
+    this->factor = max(1.0, ceil(log2(n)));
+
+    if (verbose)
+    {
+        cout << "Initializing RRR with t=" << t << " and factor=" << factor << endl;
+    }
+
+    auto tables = create_tables(this->t);
+    this->lookup_table = tables.first;
+    this->pattern_to_offset = tables.second;
+
+    this->k_vector = K(bv, this->t, verbose);
+    this->r_vector = R(bv, this->pattern_to_offset, this->t, verbose);
+    
+    this->sb_vector = superblock(this->k_vector, this->factor, this->t, verbose);
+
 }
-*/
