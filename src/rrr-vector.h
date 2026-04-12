@@ -26,7 +26,8 @@ public:
     ~RRR15();
 
     bitVector B(const std::string& s);
-    
+    size_t access(size_t i) const;
+    size_t rank0(size_t i) const;
     std::pair<std::vector<std::vector<bitVector>>, std::unordered_map<std::string, size_t>> 
     create_tables(size_t t);
 

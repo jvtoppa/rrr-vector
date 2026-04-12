@@ -96,6 +96,31 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     cout << "Rank Operation Time (per operation) " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
 }
 
+void test_rrr_access_rank0() {
+
+    std::string input = "AB"; 
+    RRR15 rrr(input);
+
+    std::cout << "Testing RRR15 with ASCII-to-Binary encoding..." << std::endl;
+
+    assert(rrr.access(0) == 0); // 2^0
+    assert(rrr.access(1) == 1); // 2^1
+    assert(rrr.access(2) == 0);
+    assert(rrr.access(3) == 0);
+    assert(rrr.access(4) == 0);
+    assert(rrr.access(5) == 0);
+    assert(rrr.access(6) == 0); // 2^6
+    assert(rrr.access(7) == 1); // 2^7
+    std::cout << "[PASS] Access verified for ASCII bit-patterns." << std::endl;
+
+    assert(rrr.rank0(8) == 6);
+
+    assert(rrr.rank0(16) == 12);
+
+    assert(rrr.rank0(10) == 7);
+
+    std::cout << "[PASS] Rank0 verified for ASCII bit-patterns." << std::endl;
+}
 
 int main()
 {
@@ -108,7 +133,7 @@ int main()
     test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
 
     test_rank1_correctness("Short string", "hi");
- 
+    test_rrr_access_rank0();
     for (size_t i = 40; i < 1e9; i *= 10)
     {
         benchmark_rank1(i,i / 10);

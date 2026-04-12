@@ -178,7 +178,8 @@ vector<size_t> RRR15::R(bitVector& bv, unordered_map<string, size_t> &map, size_
     return R;
 }
 
-size_t RRR15::rank1(size_t i) const {
+size_t RRR15::rank1(size_t i) const
+{
 
     if (i >= n)
     {
@@ -205,6 +206,19 @@ size_t RRR15::rank1(size_t i) const {
 }
 
 
+size_t RRR15::rank0(size_t i) const
+{
+    return i - rank1(i);
+}
+
+size_t RRR15::access(size_t i) const {
+    size_t block_index = i / t;
+    size_t bit_offset = i % t;
+
+    const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
+
+    return block[bit_offset];
+}
 RRR15::RRR15(const string& s, bool verbose) : verbose(verbose)
 {
     bitVector bv = B(s); 
