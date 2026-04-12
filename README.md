@@ -8,9 +8,11 @@ To create an RRR structure, use RRR15(string).
 
 Operations:
 
-- rank0(i)
-- rank1(i)
-- access(i)
+Let $i \in [0, size(bitvector(string))]$ 
+
+- rank0( $i$ )
+- rank1( $i$ )
+- access( $i$ ) / operator[ $i$ ]
 
 # Some stats:
 
