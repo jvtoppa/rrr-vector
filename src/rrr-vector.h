@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include "../include/bitvector.h"
 
+using namespace std;
+
 class RRR15 {
 private:
     size_t n;
@@ -13,31 +15,80 @@ private:
     size_t factor;
     bool verbose;
 
-    std::vector<size_t> k_vector;
-    std::vector<size_t> r_vector;
-    std::vector<size_t> sb_vector;
+    vector<size_t> k_vector;
+    vector<size_t> r_vector;
+    vector<size_t> sb_vector;
     
-    std::vector<std::vector<bitVector>> lookup_table;
-    std::unordered_map<std::string, size_t> pattern_to_offset;
+    vector<vector<bitVector>> lookup_table;
+    unordered_map<string, size_t> pattern_to_offset;
 
 public:
-    RRR15(const std::string& s, bool verbose = false);
+    RRR15(const string& s, bool verbose = false);
 
     ~RRR15();
     
-    bitVector B(const std::string& s);
-    inline size_t access(size_t i) const;
-    inline size_t rank0(size_t i) const;
-    std::pair<std::vector<std::vector<bitVector>>, std::unordered_map<std::string, size_t>> 
+    template <typename container> bitVector B(const container& c)
+    {
+        return B(c.begin(), c.end());
+    }
+
+    template <typename it> bitVector B(const it begin, const it end)
+    {
+        using T = typename std::iterator_traits<it>::value_type;
+        static_assert(is_integral_v<T>, "Elements must be integral");
+        auto s_of = sizeof(T) * 8;
+        auto n = distance(begin, end);
+        bitVector bv = bitVector(n * s_of, s_of);
+
+        for (auto iter = begin; iter != end; iter++)
+        {
+            const T& c = *iter;
+            
+            for (int i = s_of - 1; i >= 0; i--)
+            {
+                if ((c >> i) & 1)
+                {
+                    bv.append1();
+                }
+                else
+                {
+                    bv.append0();
+                }
+            }
+        }
+        return bv;
+    }
+
+
+    inline size_t rank0(const size_t i) const
+    {
+        return i - rank1(i);
+    }
+
+    inline size_t access(const size_t i) const
+    {
+        size_t block_index = i / t;
+        size_t bit_offset = i % t;
+
+        const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
+
+        return block[bit_offset];
+    }
+
+    inline size_t operator[](const size_t i) const
+    {
+        return access(i);
+    }
+
+    pair<vector<vector<bitVector>>, unordered_map<string, size_t>> 
     create_tables(size_t t);
-    inline size_t RRR15::operator[](const size_t i) const
 
-    std::vector<size_t> K(const bitVector& bv, size_t t, bool verbose);
+    vector<size_t> K(const bitVector& bv, size_t t, bool verbose);
 
-    std::vector<size_t> R(bitVector& bv, std::unordered_map<std::string, size_t>& map, 
+    vector<size_t> R(bitVector& bv, unordered_map<string, size_t>& map, 
                          size_t t, bool verbose);
 
-    std::vector<size_t> superblock(const std::vector<size_t>& K, size_t factor, 
+    vector<size_t> superblock(const vector<size_t>& K, size_t factor, 
                                   size_t t, bool verbose);
 
     size_t rank1(size_t i) const;

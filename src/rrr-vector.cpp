@@ -6,32 +6,10 @@
 #include <cmath>
 #include <unordered_map>
 #include <bit>
+
 using namespace std;
 
-
 RRR15::~RRR15() {}
-
-bitVector RRR15::B(const string& s)
-{
-    size_t n = s.size();
-    bitVector bv = bitVector(n * 8, 8);
-
-    for (size_t c : s)
-    {
-        for (int i = 7; i >= 0; i--)
-        {
-            if ((c >> i) & 1)
-            {
-                bv.append1();
-            }
-            else
-            {
-                bv.append0();
-            }
-        }
-    }
-    return bv;
-}
 
 // There are 2^t possible bitvectors. Each of them must be saved to a class based
 // on no. of zeros.
@@ -201,30 +179,10 @@ size_t RRR15::rank1(size_t i) const
     size_t bit_offset = i % t;
     
     sum += block.popcount(bit_offset);
-
+    
     return sum;
 }
 
-
-inline size_t RRR15::rank0(const size_t i) const
-{
-    return i - rank1(i);
-}
-
-inline size_t RRR15::access(const size_t i) const
-{
-    size_t block_index = i / t;
-    size_t bit_offset = i % t;
-
-    const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
-
-    return block[bit_offset];
-}
-
-inline size_t RRR15::operator[](const size_t i) const
-{
-    return access(i);
-}
 
 RRR15::RRR15(const string& s, bool verbose) : verbose(verbose)
 {

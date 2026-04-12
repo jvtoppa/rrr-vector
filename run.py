@@ -12,7 +12,10 @@ if not os.path.exists(binary_path):
     except:
         print("Error: 'make' failed.")
         exit(1)
-
+else:
+     subprocess.run(["make","clean"], check=True)
+     subprocess.run(["make"], check=True)
+     print("Rebuilt the binary.")
 
 result = subprocess.run([binary_path], capture_output=True, text=True)
 

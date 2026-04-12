@@ -64,7 +64,7 @@ void test_rank1_correctness(string test_name, string input_string)
 
 void benchmark_rank1(size_t string_size, size_t num_queries)
 {
-    cout << "\n--- Benchmarking RRR vs Naive ---\n";
+    //cout << "\n--- Benchmarking RRR vs Naive ---\n";
 
     string_size /= 4;
    
@@ -73,8 +73,18 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     for (size_t i = 0; i < string_size; i++) {
         large_string[i] = (char)(rand() % 256);
     }
+    
+    auto start_structure_rrr = chrono::high_resolution_clock::now();
 
-   RRR15 rrr(large_string, false);
+    RRR15 rrr(large_string, false);
+    
+    auto end_structure_rrr = chrono::high_resolution_clock::now();
+    
+    chrono::duration<double, std::milli> rrr_construction_time = end_structure_rrr - start_structure_rrr;
+
+    cout << "Construction time:   " << rrr_construction_time.count() << " ms\n";
+
+
     vector<size_t> queries(num_queries);
     for(size_t i = 0; i < num_queries; ++i) {
         queries[i] = rand() % (string_size * 8);
@@ -91,7 +101,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     
     chrono::duration<double, std::milli> rrr_time = end_rrr - start_rrr;
 
-    cout << "Tested " << num_queries << " queries on a bitvector of size " << string_size * 8 << " bits.\n";
+    cout << "Number of Queries: " << num_queries << " | Bitvector size: " << string_size * 8 << " bits.\n";
     cout << "Rank Operation Time (total):   " << rrr_time.count() << " ms\n";
     cout << "Rank Operation Time (per operation) " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
 }
