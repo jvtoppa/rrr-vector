@@ -4,7 +4,13 @@ RRR is a two-layered indexing algorithm for calculating succint rank/select in a
 
 # Creating an RRR object
 
-To create an RRR structure, use RRR15(string). To find a position, do RRR15.rank1(pos).
+To create an RRR structure, use RRR15(string).
+
+Operations:
+
+- rank0(i)
+- rank1(i)
+- access(i)
 
 # Some stats:
 
