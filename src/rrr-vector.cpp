@@ -206,12 +206,13 @@ size_t RRR15::rank1(size_t i) const
 }
 
 
-size_t RRR15::rank0(size_t i) const
+inline size_t RRR15::rank0(const size_t i) const
 {
     return i - rank1(i);
 }
 
-size_t RRR15::access(size_t i) const {
+inline size_t RRR15::access(const size_t i) const
+{
     size_t block_index = i / t;
     size_t bit_offset = i % t;
 
@@ -219,6 +220,12 @@ size_t RRR15::access(size_t i) const {
 
     return block[bit_offset];
 }
+
+inline size_t RRR15::operator[](const size_t i) const
+{
+    return access(i);
+}
+
 RRR15::RRR15(const string& s, bool verbose) : verbose(verbose)
 {
     bitVector bv = B(s); 
