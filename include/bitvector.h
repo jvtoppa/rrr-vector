@@ -58,7 +58,7 @@ class bitVector {
     void append1();
 
     void append(unsigned long number, unsigned long k);
-
+    uint16_t get_block_as_int(size_t bit_idx, size_t t) const;
 
       void print();
 };

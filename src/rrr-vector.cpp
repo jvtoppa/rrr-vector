@@ -4,8 +4,9 @@
 #include "../include/bitvector.h"
 #include "rrr-vector.h"
 #include <cmath>
-#include <unordered_map>
 #include <bit>
+#include <cstring>
+
 
 using namespace std;
 
@@ -13,78 +14,46 @@ RRR15::~RRR15() {}
 
 // There are 2^t possible bitvectors. Each of them must be saved to a class based
 // on no. of zeros.
-pair<vector<vector<bitVector>>, unordered_map<string, size_t>> RRR15::create_tables(size_t t) // access: table[class][block]
-{
-    vector<vector<bitVector>> table(t + 1);
-    unordered_map<string, size_t> pattern_to_offset;
+void RRR15::create_tables(size_t t) {
+    
+    size_t total_patterns = 1 << t; //2^t
+    
+    memset(pattern_to_class, 0, sizeof(pattern_to_class));
+    memset(pattern_to_offset, 0, sizeof(pattern_to_offset));
 
-    size_t total = 1 << t;
-    bitVector block = bitVector(t, t);
-    for (size_t i = 0; i < t; i++)
-    {
-        block.append0();
+    lookup_table.assign(t + 1, vector<uint16_t>());
+    
+    vector<size_t> class_counters(t + 1, 0);
+
+    for (uint32_t x = 0; x < total_patterns; x++) {
+        
+        uint8_t clss = __builtin_popcountll(x);
+        
+        uint16_t offset = class_counters[clss]++;
+        
+        pattern_to_class[x] = clss;
+        pattern_to_offset[x] = offset;
+
+        lookup_table[clss].push_back((uint16_t)x);
     }
-
-    for (size_t x = 0; x < total; x++)
-    {
-        string pattern = "";
-        for (size_t i = 0; i < t; i++)
-        {
-            block.set0(i);
-        }
-        size_t clss = 0;
-        for (size_t j = t; j > 0; j--)
-        {
-            size_t bit = (x >> (j - 1)) & 1;
-            if (bit == 1)
-            {
-                pattern += "1";
-                block.set1(t - j);
-                clss++;
-            }
-
-            else
-                pattern += "0";
-        }
-
-        size_t offset = table[clss].size();
-        table[clss].push_back(block);
-        pattern_to_offset[pattern] = offset;
-    }
-
-    return {table, pattern_to_offset};
 }
 
-vector<size_t> RRR15::K(const bitVector& bv, size_t t, bool verbose) //should be done with popcount
-{
-    size_t n = bv.getLength();
-    vector<size_t> v;
-    size_t counter = 0;
+void RRR15::build(const bitVector& bv) {
+    size_t num_blocks = (bv.getLength() + t - 1) / t;
+    k_vector.reserve(num_blocks);
+    r_vector.reserve(num_blocks);
 
-    for (size_t i = 0; i < n; i++)
-    {
-        auto bit = bv[i];
+    for (size_t i = 0; i < bv.getLength(); i += t) {
 
-        if (bit == 1)
-            counter++;
+        uint16_t block_val = bv.get_block_as_int(i, t);
+        
+        uint8_t clss = pattern_to_class[block_val];
+        uint16_t offset = pattern_to_offset[block_val];
+        
+        k_vector.push_back(clss);
+        r_vector.push_back(offset);
 
-        if ((i + 1) % t == 0 || i == n - 1)
-        {
-            v.push_back(counter);
-            counter = 0;
-        }
     }
-    if(verbose)
-    {
-        cout << "K: ";
-        for (auto item : v)
-        {
-            cout << item << " ";
-        }
-        cout << "\n";
-    }
-
-    return v;
 }
 
 vector<size_t> RRR15::superblock(const vector<size_t> &K, size_t factor, size_t t, bool verbose) //TODO: add tuple with marker for variable R. Should receive R as part of the function
@@ -115,47 +84,6 @@ vector<size_t> RRR15::superblock(const vector<size_t> &K, size_t factor, size_t 
     return superblock;
 }
 
-
-vector<size_t> RRR15::R(bitVector& bv, unordered_map<string, size_t> &map, size_t t, bool verbose)
-{
-    size_t n = bv.getLength();
-    string block = "";
-    vector<size_t> R;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        if (bv[i] == 1)
-            block += "1";
-        else
-            block += "0";
-
-        if ((i + 1) % t == 0)
-        {
-            R.push_back(map[block]);
-            block = "";
-        }
-    }
-    if (!block.empty())
-    {
-        while (block.length() < t)
-        {
-            block += "0";
-        }
-        R.push_back(map[block]);
-    }
-    if(verbose)
-    {
-        cout << "R: ";
-        for (size_t i = 0; i < R.size(); i++)
-        {
-            cout << R[i] << " ";
-        }
-        cout << "\n";
-    }
-
-    return R;
-}
-
 size_t RRR15::rank1(size_t i) const
 {
 
@@ -174,11 +102,13 @@ size_t RRR15::rank1(size_t i) const
         sum += k_vector[j];
     }
 
-    const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
+    const uint16_t block = lookup_table[k_vector[block_index]][r_vector[block_index]];
 
     size_t bit_offset = i % t;
-    
-    sum += block.popcount(bit_offset);
+        
+    uint16_t aligned_block = block << (16 - t);
+
+    sum += __builtin_popcount(aligned_block & mask_table[bit_offset]);
     
     return sum;
 }
@@ -198,12 +128,8 @@ RRR15::RRR15(const string& s, bool verbose) : verbose(verbose)
         cout << "Initializing RRR with t=" << t << " and factor=" << factor << endl;
     }
 
-    auto tables = create_tables(this->t);
-    this->lookup_table = tables.first;
-    this->pattern_to_offset = tables.second;
-
-    this->k_vector = K(bv, this->t, verbose);
-    this->r_vector = R(bv, this->pattern_to_offset, this->t, verbose);
+    create_tables(this->t);
+    build(bv);
     
     this->sb_vector = superblock(this->k_vector, this->factor, this->t, verbose);
 

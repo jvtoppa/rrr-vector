@@ -25,16 +25,18 @@ using namespace std;
 #endif
 
 uint32_t mask32[] = {
-  0xFFFFFFFF,0x7FFFFFFF,0x3FFFFFFF,0x1FFFFFFF,
-  0x0FFFFFFF,0x07FFFFFF,0x03FFFFFF,0x01FFFFFF,
-  0x00FFFFFF,0x007FFFFF,0x003FFFFF,0x001FFFFF,
-  0x000FFFFF,0x0007FFFF,0x0003FFFF,0x0001FFFF,
-  0x0000FFFF,0x00007FFF,0x00003FFF,0x00001FFF,
-  0x00000FFF,0x000007FF,0x000003FF,0x000001FF,
-  0x000000FF,0x0000007F,0x0000003F,0x0000001F,
-  0x0000000F,0x00000007,0x00000003,0x00000001,
-  0x00000000
+    0xFFFFFFFF,0x7FFFFFFF,0x3FFFFFFF,0x1FFFFFFF,
+    0x0FFFFFFF,0x07FFFFFF,0x03FFFFFF,0x01FFFFFF,
+    0x00FFFFFF,0x007FFFFF,0x003FFFFF,0x001FFFFF,
+    0x000FFFFF,0x0007FFFF,0x0003FFFF,0x0001FFFF,
+    0x0000FFFF,0x00007FFF,0x00003FFF,0x00001FFF,
+    0x00000FFF,0x000007FF,0x000003FF,0x000001FF,
+    0x000000FF,0x0000007F,0x0000003F,0x0000001F,
+    0x0000000F,0x00000007,0x00000003,0x00000001,
+    0x00000000
 };
+
+
 
 uint64_t mask64[] = {
   0xFFFFFFFFFFFFFFFF,0x7FFFFFFFFFFFFFFF,0x3FFFFFFFFFFFFFFF,0x1FFFFFFFFFFFFFFF,
@@ -109,6 +111,24 @@ bitVector::bitVector(bitVector&& other) noexcept
     other.A = nullptr;
     other.cap = 0;
     other.len = 0;
+}
+
+uint16_t bitVector::get_block_as_int(size_t bit_idx, size_t t) const
+{
+    size_t word_idx = bit_idx / NBITS;
+    size_t offset = bit_idx % NBITS;
+    
+    if (offset + t <= NBITS)
+    {
+        return (A[word_idx] >> (NBITS - offset - t)) & ((1 << t) - 1);
+    }
+    
+    else
+    {
+        uint64_t high = A[word_idx] & ((1ULL << (NBITS - offset)) - 1);
+        uint64_t low = A[word_idx + 1] >> (NBITS - (t - (NBITS - offset)));
+        return (high << (t - (NBITS - offset))) | low;
+    }
 }
 
 // Copy assignment operator

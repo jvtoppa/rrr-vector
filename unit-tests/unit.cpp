@@ -64,9 +64,8 @@ void test_rank1_correctness(string test_name, string input_string)
 
 void benchmark_rank1(size_t string_size, size_t num_queries)
 {
-    //cout << "\n--- Benchmarking RRR vs Naive ---\n";
+   // cout << "\n--- Benchmarking RRR ---\n";
 
-    string_size /= 4;
    
     string large_string(string_size, 'a');
    
@@ -82,7 +81,7 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     
     chrono::duration<double, std::milli> rrr_construction_time = end_structure_rrr - start_structure_rrr;
 
-    cout << "Construction time:   " << rrr_construction_time.count() << " ms\n";
+    cout << "Construction time: " << rrr_construction_time.count() << " ms\n";
 
 
     vector<size_t> queries(num_queries);
@@ -101,9 +100,9 @@ void benchmark_rank1(size_t string_size, size_t num_queries)
     
     chrono::duration<double, std::milli> rrr_time = end_rrr - start_rrr;
 
-    cout << "Number of Queries: " << num_queries << " | Bitvector size: " << string_size * 8 << " bits.\n";
-    cout << "Rank Operation Time (total):   " << rrr_time.count() << " ms\n";
-    cout << "Rank Operation Time (per operation) " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
+    //cout << "Number of Queries: " << num_queries << " | Bitvector size: " << string_size * 8 << " bits.\n";
+    //cout << "Rank Operation Time (total):   " << rrr_time.count() << " ms\n";
+    cout << "Operation Time: " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
 }
 
 void test_rrr_access_rank0() {
@@ -132,26 +131,57 @@ void test_rrr_access_rank0() {
     std::cout << "[PASS] Rank0 verified for ASCII bit-patterns." << std::endl;
 }
 
+
+/*
 int main()
 {
-    cout << "Running RRR Unit Tests\n\n";
+    //    cout << "Running RRR Unit Tests\n\n";
+    
+    //  test_rank1_correctness("All identical chars", "aaaaaaaaaaaaaaaaaaa");
+    
+    // test_rank1_correctness("Alternating chars", "abababababababab");
+    
+    //test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
+    
+    //test_rank1_correctness("Short string", "hi");
+    //test_rrr_access_rank0();
+    
+    
+    benchmark_rank1(1e8, 1e6);
+    
+    //  }
+    
+    
+    //    cout << "\n--- All tests passed successfully! ---\n";
+    
+    return 0;
+}
+*/
 
-    test_rank1_correctness("All identical chars", "aaaaaaaaaaaaaaaaaaa");
-
-    test_rank1_correctness("Alternating chars", "abababababababab");
-
-    test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
-
-    test_rank1_correctness("Short string", "hi");
-    test_rrr_access_rank0();
-    for (size_t i = 40; i < 1e9; i *= 10)
-    {
-        benchmark_rank1(i,i / 10);
-        
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Usage: %s <a> <b>\n", argv[0]);
+        return 1;
     }
-    
-    
-    cout << "\n--- All tests passed successfully! ---\n";
+
+    char *end;
+
+    double a_tmp = strtod(argv[1], &end);
+    if (*end != '\0') {
+        printf("Invalid input for a\n");
+        return 1;
+    }
+
+    double b_tmp = strtod(argv[2], &end);
+    if (*end != '\0') {
+        printf("Invalid input for b\n");
+        return 1;
+    }
+
+    size_t a = (size_t)a_tmp;
+    size_t b = (size_t)b_tmp;
+
+    benchmark_rank1(a, b);
 
     return 0;
 }

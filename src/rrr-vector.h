@@ -3,10 +3,16 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include "../include/bitvector.h"
 
 using namespace std;
+
+inline constexpr uint16_t mask_table[] = {
+    0x8000, 0xC000, 0xE000, 0xF000, 
+    0xF800, 0xFC00, 0xFE00, 0xFF00, 
+    0xFF80, 0xFFC0, 0xFFE0, 0xFFF0, 
+    0xFFF8, 0xFFFC, 0xFFFE, 0xFFFF
+};
 
 class RRR15 {
 private:
@@ -19,9 +25,9 @@ private:
     vector<size_t> r_vector;
     vector<size_t> sb_vector;
     
-    vector<vector<bitVector>> lookup_table;
-    unordered_map<string, size_t> pattern_to_offset;
-
+    uint16_t pattern_to_offset[32768];
+    uint8_t  pattern_to_class[32768];
+    vector<vector<uint16_t>> lookup_table;
 public:
     RRR15(const string& s, bool verbose = false);
 
@@ -65,28 +71,23 @@ public:
         return i - rank1(i);
     }
 
-    inline size_t access(const size_t i) const
-    {
-        size_t block_index = i / t;
-        size_t bit_offset = i % t;
+        inline size_t access(const size_t i) const
+        {
+            size_t block_index = i / t;
+            size_t bit_offset = i % t;
 
-        const bitVector& block = lookup_table[k_vector[block_index]][r_vector[block_index]];
-
-        return block[bit_offset];
-    }
+            uint16_t pattern = lookup_table[k_vector[block_index]][r_vector[block_index]];
+            return (pattern >> (t - 1 - bit_offset)) & 1;
+        }
 
     inline size_t operator[](const size_t i) const
     {
         return access(i);
     }
 
-    pair<vector<vector<bitVector>>, unordered_map<string, size_t>> 
-    create_tables(size_t t);
+    void create_tables(size_t t);
 
-    vector<size_t> K(const bitVector& bv, size_t t, bool verbose);
-
-    vector<size_t> R(bitVector& bv, unordered_map<string, size_t>& map, 
-                         size_t t, bool verbose);
+    void build(const bitVector& bv); 
 
     vector<size_t> superblock(const vector<size_t>& K, size_t factor, 
                                   size_t t, bool verbose);
