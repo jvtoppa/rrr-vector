@@ -14,7 +14,7 @@ Let $i \in [0, size(bitvector(string))]$
 - rank1( $i$ )
 - access( $i$ ) / operator[ $i$ ]
 
-# Some stats:
+# Some results:
 
 Rank Operation Performance
 
@@ -29,6 +29,12 @@ Rank Operation Performance
 | 4,000,000 | 80,000,000 | 261.037000 | 65.2593 |
 | 40,000,000 | 800,000,000 | 3801.100000 | 95.0276 |
 
+
+The following graph corresponds to the median values of $n$ iterations until $\frac{IQR(Q_1, Q_3)}{median} \leq 5%$ (i.e., the data shown has low variation in the $50%$ most representative data). $Q_1$ and $Q_3$ are represented by the uncertainty bars and the dots correspond to the median. Each iteration corresponds to one million queries of $rank1()$ done in random parts of a random bitset of a given size (x axis).
+#
+###
+###
+![Results](graphs/Figure_1.png)
 
 
 # How to run
