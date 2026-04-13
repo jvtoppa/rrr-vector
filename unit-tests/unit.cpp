@@ -62,49 +62,6 @@ void test_rank1_correctness(string test_name, string input_string)
     cout << "[OK] " << test_name << " passed (tested all " << input_string.size()*8 << " bits).\n";
 }
 
-void benchmark_rank1(size_t string_size, size_t num_queries)
-{
-   // cout << "\n--- Benchmarking RRR ---\n";
-
-   
-    string large_string(string_size, 'a');
-   
-    for (size_t i = 0; i < string_size; i++) {
-        large_string[i] = (char)(rand() % 256);
-    }
-    
-    auto start_structure_rrr = chrono::high_resolution_clock::now();
-
-    RRR15 rrr(large_string, false);
-    
-    auto end_structure_rrr = chrono::high_resolution_clock::now();
-    
-    chrono::duration<double, std::milli> rrr_construction_time = end_structure_rrr - start_structure_rrr;
-
-    cout << "Construction time: " << rrr_construction_time.count() << " ms\n";
-
-
-    vector<size_t> queries(num_queries);
-    for(size_t i = 0; i < num_queries; ++i) {
-        queries[i] = rand() % (string_size * 8);
-    }
-  //  cout << "Starting doing rank operations...\n";
-   // cout << "No. of rank queries: " << num_queries << "\n";
-    
-    auto start_rrr = chrono::high_resolution_clock::now();
-    for(size_t q : queries) {
-        rrr.rank1(q);
-    }
-    
-    auto end_rrr = chrono::high_resolution_clock::now();
-    
-    chrono::duration<double, std::milli> rrr_time = end_rrr - start_rrr;
-
-    //cout << "Number of Queries: " << num_queries << " | Bitvector size: " << string_size * 8 << " bits.\n";
-    //cout << "Rank Operation Time (total):   " << rrr_time.count() << " ms\n";
-    cout << "Operation Time: " << (rrr_time.count() / num_queries)*1e6 << "ns \n";
-}
-
 void test_rrr_access_rank0() {
 
     std::string input = "AB"; 
@@ -120,7 +77,7 @@ void test_rrr_access_rank0() {
     assert(rrr.access(5) == 0);
     assert(rrr.access(6) == 0); // 2^6
     assert(rrr.access(7) == 1); // 2^7
-    std::cout << "[PASS] Access verified for ASCII bit-patterns." << std::endl;
+    std::cout << "[OK] Access verified for ASCII bit-patterns." << std::endl;
 
     assert(rrr.rank0(8) == 6);
 
@@ -128,60 +85,25 @@ void test_rrr_access_rank0() {
 
     assert(rrr.rank0(10) == 7);
 
-    std::cout << "[PASS] Rank0 verified for ASCII bit-patterns." << std::endl;
+    std::cout << "[OK] Rank0 verified for ASCII bit-patterns." << std::endl;
 }
 
 
-/*
+
 int main()
 {
-    //    cout << "Running RRR Unit Tests\n\n";
+    cout << "Running RRR Unit Tests\n\n";
     
-    //  test_rank1_correctness("All identical chars", "aaaaaaaaaaaaaaaaaaa");
+    test_rank1_correctness("All identical chars", "aaaaaaaaaaaaaaaaaaa");
     
-    // test_rank1_correctness("Alternating chars", "abababababababab");
+    test_rank1_correctness("Alternating chars", "abababababababab");
     
-    //test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
+    test_rank1_correctness("Random words", "the quick brown fox jumps over the lazy dog");
     
-    //test_rank1_correctness("Short string", "hi");
-    //test_rrr_access_rank0();
+    test_rank1_correctness("Short string", "hi");
+    test_rrr_access_rank0();
     
+    cout << "\n--- All tests passed successfully! ---\n";
     
-    benchmark_rank1(1e8, 1e6);
-    
-    //  }
-    
-    
-    //    cout << "\n--- All tests passed successfully! ---\n";
-    
-    return 0;
-}
-*/
-
-int main(int argc, char *argv[]) {
-    if (argc < 3) {
-        printf("Usage: %s <a> <b>\n", argv[0]);
-        return 1;
-    }
-
-    char *end;
-
-    double a_tmp = strtod(argv[1], &end);
-    if (*end != '\0') {
-        printf("Invalid input for a\n");
-        return 1;
-    }
-
-    double b_tmp = strtod(argv[2], &end);
-    if (*end != '\0') {
-        printf("Invalid input for b\n");
-        return 1;
-    }
-
-    size_t a = (size_t)a_tmp;
-    size_t b = (size_t)b_tmp;
-
-    benchmark_rank1(a, b);
-
     return 0;
 }
